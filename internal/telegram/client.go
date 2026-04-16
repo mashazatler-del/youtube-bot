@@ -18,9 +18,10 @@ type Client struct {
 	http    *http.Client
 }
 
-func NewClient(token string) *Client {
+func NewClient(token, chatID string) *Client {
 	return &Client{
 		token:   token,
+		chatID:  chatID,
 		baseURL: fmt.Sprintf("https://api.telegram.org/bot%s", token),
 		http:    &http.Client{},
 	}

@@ -30,8 +30,7 @@ func TestSendMessage(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient("testtoken")
-	c.chatID = "123"
+	c := NewClient("testtoken", "123")
 	c.baseURL = srv.URL
 
 	err := c.SendMessage(context.Background(), "hello")
@@ -46,8 +45,7 @@ func TestSendMessageError(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient("testtoken")
-	c.chatID = "123"
+	c := NewClient("testtoken", "123")
 	c.baseURL = srv.URL
 
 	err := c.SendMessage(context.Background(), "hello")
@@ -73,7 +71,7 @@ func TestWaitForStart(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient("testtoken")
+	c := NewClient("testtoken", "")
 	c.baseURL = srv.URL
 
 	err := c.WaitForStart(context.Background())

@@ -44,9 +44,10 @@ func main() {
 	apiKey := requireEnv("YOUTUBE_API_KEY")
 	handle := requireEnv("YOUTUBE_CHANNEL_HANDLE")
 	botToken := requireEnv("TELEGRAM_BOT_TOKEN")
+	chatID := os.Getenv("TELEGRAM_CHAT_ID")
 
 	yt := youtube.NewClient(apiKey, handle)
-	tg := telegram.NewClient(botToken)
+	tg := telegram.NewClient(botToken, chatID)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -59,8 +60,10 @@ func main() {
 		cancel()
 	}()
 
-	if err := tg.WaitForStart(ctx); err != nil {
-		log.Fatalf("waiting for /start: %v", err)
+	if chatID == "" {
+		if err := tg.WaitForStart(ctx); err != nil {
+			log.Fatalf("waiting for /start: %v", err)
+		}
 	}
 
 	p := poller.New(yt, tg, 30*time.Minute)
