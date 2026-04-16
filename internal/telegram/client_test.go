@@ -30,7 +30,8 @@ func TestSendMessage(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient("testtoken", "123")
+	c := NewClient("testtoken")
+	c.chatID = "123"
 	c.baseURL = srv.URL
 
 	err := c.SendMessage(context.Background(), "hello")
@@ -45,11 +46,41 @@ func TestSendMessageError(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient("testtoken", "123")
+	c := NewClient("testtoken")
+	c.chatID = "123"
 	c.baseURL = srv.URL
 
 	err := c.SendMessage(context.Background(), "hello")
 	if err == nil {
 		t.Fatal("expected error for bad status")
+	}
+}
+
+func TestWaitForStart(t *testing.T) {
+	callCount := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		resp := getUpdatesResponse{
+			OK: true,
+			Result: []update{
+				{
+					UpdateID: 1,
+					Message:  &message{Chat: chat{ID: 42}, Text: "/start"},
+				},
+			},
+		}
+		json.NewEncoder(w).Encode(resp)
+	}))
+	defer srv.Close()
+
+	c := NewClient("testtoken")
+	c.baseURL = srv.URL
+
+	err := c.WaitForStart(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if c.chatID != "42" {
+		t.Fatalf("expected chatID=42, got %s", c.chatID)
 	}
 }
