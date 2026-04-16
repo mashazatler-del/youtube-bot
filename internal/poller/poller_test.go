@@ -2,7 +2,6 @@ package poller
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -57,8 +56,12 @@ func TestPollerNoNotificationOnFirstCheck(t *testing.T) {
 	p.Run(ctx)
 
 	msgs := tg.getMessages()
-	if len(msgs) != 0 {
-		t.Fatalf("expected no messages, got %v", msgs)
+	if len(msgs) != 1 {
+		t.Fatalf("expected 1 message (start only), got %d: %v", len(msgs), msgs)
+	}
+	expected := "🚀 Бот запущен! Подписчиков: 100"
+	if msgs[0] != expected {
+		t.Fatalf("expected %q, got %q", expected, msgs[0])
 	}
 }
 
@@ -74,12 +77,12 @@ func TestPollerNotifiesOnIncrease(t *testing.T) {
 	p.Run(ctx)
 
 	msgs := tg.getMessages()
-	if len(msgs) != 1 {
-		t.Fatalf("expected 1 message, got %d: %v", len(msgs), msgs)
+	if len(msgs) != 2 {
+		t.Fatalf("expected 2 messages, got %d: %v", len(msgs), msgs)
 	}
-	expected := fmt.Sprintf("📈 Подписчики: 100 → 103 (+3)")
-	if msgs[0] != expected {
-		t.Fatalf("expected %q, got %q", expected, msgs[0])
+	expected := "📈 Подписчики: 100 → 103 (+3)"
+	if msgs[1] != expected {
+		t.Fatalf("expected %q, got %q", expected, msgs[1])
 	}
 }
 
@@ -95,11 +98,11 @@ func TestPollerNotifiesOnDecrease(t *testing.T) {
 	p.Run(ctx)
 
 	msgs := tg.getMessages()
-	if len(msgs) != 1 {
-		t.Fatalf("expected 1 message, got %d: %v", len(msgs), msgs)
+	if len(msgs) != 2 {
+		t.Fatalf("expected 2 messages, got %d: %v", len(msgs), msgs)
 	}
-	expected := fmt.Sprintf("📉 Подписчики: 100 → 97 (-3)")
-	if msgs[0] != expected {
-		t.Fatalf("expected %q, got %q", expected, msgs[0])
+	expected := "📉 Подписчики: 100 → 97 (-3)"
+	if msgs[1] != expected {
+		t.Fatalf("expected %q, got %q", expected, msgs[1])
 	}
 }

@@ -38,6 +38,11 @@ func (p *Poller) Run(ctx context.Context) {
 	prev := count
 	log.Printf("initial subscriber count: %d", prev)
 
+	startMsg := fmt.Sprintf("🚀 Бот запущен! Подписчиков: %d", prev)
+	if err := p.telegram.SendMessage(ctx, startMsg); err != nil {
+		log.Printf("send start message failed: %v", err)
+	}
+
 	ticker := time.NewTicker(p.interval)
 	defer ticker.Stop()
 
